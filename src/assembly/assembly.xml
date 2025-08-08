@@ -1,0 +1,44 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.1.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">
+    <id>bin</id>
+    <formats>
+        <format>dir</format>
+        <format>zip</format>
+        <format>tar.gz</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    
+    <fileSets>
+        <!-- 复制JAR文件 -->
+        <fileSet>
+            <directory>${project.build.directory}</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>${project.artifactId}-${project.version}.jar</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+    
+    <!-- 脚本文件 -->
+    <files>
+        <!-- Windows批处理脚本 -->
+        <file>
+            <source>src/main/resources/project-scanner.bat</source>
+            <outputDirectory>/</outputDirectory>
+            <fileMode>0755</fileMode>
+        </file>
+        <!-- Windows批处理脚本（UTF-8版本） -->
+        <file>
+            <source>src/main/resources/project-scanner-utf8.bat</source>
+            <outputDirectory>/</outputDirectory>
+            <fileMode>0755</fileMode>
+        </file>
+        <!-- Unix shell脚本 -->
+        <file>
+            <source>src/main/resources/project-scanner.sh</source>
+            <outputDirectory>/</outputDirectory>
+            <fileMode>0755</fileMode>
+        </file>
+    </files>
+</assembly>
