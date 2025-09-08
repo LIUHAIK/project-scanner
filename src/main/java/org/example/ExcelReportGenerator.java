@@ -56,7 +56,7 @@ public class ExcelReportGenerator {
         headerFont.setBold(true);
         headerFont.setFontHeightInPoints((short) 12);
         headerStyle.setFont(headerFont);
-        headerStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+        headerStyle.setFillForegroundColor(IndexedColors.BRIGHT_GREEN.getIndex());
         headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         headerStyle.setBorderBottom(BorderStyle.THIN);
         headerStyle.setBorderTop(BorderStyle.THIN);

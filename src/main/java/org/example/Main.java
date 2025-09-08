@@ -49,6 +49,9 @@ public class Main {
             List<DependencyInfo> allDependencies = new ArrayList<>();
             parseDependenciesFromFiles(projectRoot, allDependencies);
             
+            // 将.so文件作为C/C++依赖添加到依赖列表
+            addSoFilesAsDependencies(soFiles, allDependencies, projectRoot);
+            
             // 生成Excel报告
             if (!allDependencies.isEmpty()) {
                 String excelPath = Paths.get(projectRoot, EXCEL_REPORT_NAME).toString();
@@ -219,6 +222,49 @@ public class Main {
                 });
         } catch (IOException e) {
             System.err.println("扫描文件时发生错误: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * 将.so文件作为C/C++依赖添加到依赖列表
+     */
+    private static void addSoFilesAsDependencies(List<String> soFiles, List<DependencyInfo> allDependencies, String projectRoot) {
+        try {
+            for (String soFile : soFiles) {
+                // 查找.so文件的实际路径
+                String soFilePath = findSoFilePath(projectRoot, soFile);
+                if (soFilePath != null) {
+                    DependencyInfo soDependency = new DependencyInfo(
+                        soFile,                    // 依赖名称（文件名）
+                        "",                        // 版本号（.so文件通常没有版本信息）
+                        "C/C++",                   // 依赖类型
+                        soFilePath,                // 文件路径
+                        soFile                     // 文件名
+                    );
+                    allDependencies.add(soDependency);
+                }
+            }
+            if (!soFiles.isEmpty()) {
+                System.out.println("添加.so文件作为C/C++依赖: " + soFiles.size() + " 个");
+            }
+        } catch (Exception e) {
+            System.err.println("添加.so文件依赖时发生错误: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * 查找.so文件的实际路径
+     */
+    private static String findSoFilePath(String projectRoot, String soFileName) {
+        try {
+            return Files.walk(Paths.get(projectRoot))
+                .filter(Files::isRegularFile)
+                .filter(path -> path.getFileName().toString().equals(soFileName))
+                .map(Path::toString)
+                .findFirst()
+                .orElse(null);
+        } catch (IOException e) {
+            return null;
         }
     }
 }
