@@ -7,6 +7,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Main {
     private static final List<String> TARGET_FILES = Arrays.asList(
@@ -16,6 +18,7 @@ public class Main {
     
     private static final String SO_FILES_TXT = "so_files.txt";
     private static final String OUTPUT_FOLDER = "project_files";
+    private static final String EXCEL_REPORT_NAME = "dependency_analysis_report.xlsx";
     
     public static void main(String[] args) {
         try {
@@ -41,6 +44,20 @@ public class Main {
             // 扫描.so文件并记录
             List<String> soFiles = scanSoFiles(projectRoot);
             writeSoFilesList(outputPath, soFiles);
+            
+            // 解析依赖信息
+            List<DependencyInfo> allDependencies = new ArrayList<>();
+            parseDependenciesFromFiles(projectRoot, allDependencies);
+            
+            // 生成Excel报告
+            if (!allDependencies.isEmpty()) {
+                String excelPath = Paths.get(projectRoot, EXCEL_REPORT_NAME).toString();
+                ExcelReportGenerator.generateDependencyReport(allDependencies, excelPath);
+                System.out.println("依赖分析报告已生成: " + EXCEL_REPORT_NAME);
+                System.out.println("共解析到 " + allDependencies.size() + " 个依赖");
+            } else {
+                System.out.println("未找到任何依赖信息");
+            }
             
             // 创建ZIP文件（带时间戳）
             String timestamp = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
@@ -154,6 +171,54 @@ public class Main {
                         System.err.println("删除文件失败: " + filePath + " - " + e.getMessage());
                     }
                 });
+        }
+    }
+    
+    /**
+     * 解析项目文件中的依赖信息
+     */
+    private static void parseDependenciesFromFiles(String projectRoot, List<DependencyInfo> allDependencies) {
+        try {
+            Files.walk(Paths.get(projectRoot))
+                .filter(Files::isRegularFile)
+                .forEach(filePath -> {
+                    String fileName = filePath.getFileName().toString().toLowerCase();
+                    String filePathStr = filePath.toString();
+                    
+                    try {
+                        switch (fileName) {
+                            case "package.json":
+                                List<DependencyInfo> packageDeps = DependencyParser.parsePackageJson(filePathStr);
+                                allDependencies.addAll(packageDeps);
+                                System.out.println("解析package.json: " + filePathStr + " - 找到 " + packageDeps.size() + " 个依赖");
+                                break;
+                            case "pubspec.yaml":
+                                List<DependencyInfo> pubspecDeps = DependencyParser.parsePubspecYaml(filePathStr);
+                                allDependencies.addAll(pubspecDeps);
+                                System.out.println("解析pubspec.yaml: " + filePathStr + " - 找到 " + pubspecDeps.size() + " 个依赖");
+                                break;
+                            case "build.gradle":
+                                List<DependencyInfo> gradleDeps = DependencyParser.parseBuildGradle(filePathStr);
+                                allDependencies.addAll(gradleDeps);
+                                System.out.println("解析build.gradle: " + filePathStr + " - 找到 " + gradleDeps.size() + " 个依赖");
+                                break;
+                            case "cmakelists.txt":
+                                List<DependencyInfo> cmakeDeps = DependencyParser.parseCMakeLists(filePathStr);
+                                allDependencies.addAll(cmakeDeps);
+                                System.out.println("解析CMakeLists.txt: " + filePathStr + " - 找到 " + cmakeDeps.size() + " 个依赖");
+                                break;
+                            case "settings.gradle":
+                                List<DependencyInfo> settingsDeps = DependencyParser.parseSettingsGradle(filePathStr);
+                                allDependencies.addAll(settingsDeps);
+                                System.out.println("解析settings.gradle: " + filePathStr + " - 找到 " + settingsDeps.size() + " 个依赖");
+                                break;
+                        }
+                    } catch (Exception e) {
+                        System.err.println("解析文件失败: " + filePathStr + " - " + e.getMessage());
+                    }
+                });
+        } catch (IOException e) {
+            System.err.println("扫描文件时发生错误: " + e.getMessage());
         }
     }
 }
