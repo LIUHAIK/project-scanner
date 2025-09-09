@@ -16,7 +16,7 @@ public class DependencyParser {
     public static List<DependencyInfo> parsePackageJson(String filePath) {
         List<DependencyInfo> dependencies = new ArrayList<>();
         try {
-            String content = Files.readString(Paths.get(filePath));
+            String content = new String(Files.readAllBytes(Paths.get(filePath)), "UTF-8");
             
             // 解析dependencies
             parseJsonDependencies(content, "dependencies", dependencies, filePath, "RN");

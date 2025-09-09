@@ -55,7 +55,7 @@ java -jar project-scanner-1.0-SNAPSHOT.jar
 
 ### 前提条件
 
-- Java 17 或更高版本
+- Java 8 或更高版本
 
 **如果未安装Java，请先运行：**
 ```cmd
@@ -191,7 +191,7 @@ java -jar project-scanner-1.0-SNAPSHOT.jar
 
 ## 系统要求
 
-- Java 17 或更高版本
+- Java 8 或更高版本
 - Windows 10/11 或 macOS 10.14+ 或 Linux
 - 至少 100MB 可用磁盘空间
 
@@ -200,7 +200,7 @@ java -jar project-scanner-1.0-SNAPSHOT.jar
 ### 常见问题
 
 1. **"未找到Java运行时环境"**
-   - 确保已安装Java 17或更高版本
+   - 确保已安装Java 8或更高版本
    - 确保Java已添加到系统PATH环境变量
 
 2. **"未找到JAR文件"**
@@ -283,7 +283,7 @@ target_link_libraries(myapp PRIVATE Boost::boost)
 
 ## 开发信息
 
-- 开发语言：Java 17
+- 开发语言：Java 8
 - 构建工具：Maven
 - 主要依赖：
   - Java标准库
